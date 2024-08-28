@@ -1,0 +1,95 @@
+local Players = game:GetService("Players")
+local DataStoreService = game:GetService("DataStoreService")
+local DataStore = DataStoreService:GetDataStore("PlayerData")
+
+local DEFAULT_PLAYER_DATA = {
+	["coins"] = 500,
+	["gems"] = 0,
+	["times_played"] = 0
+}
+
+local playerData = {}
+
+
+-- 플레이어 함수
+
+function playerJoined(player)
+	-- 데이터 호출 및 캐싱
+	playerData[player.Name] = get(player)
+	
+	-- times_played 업데이트
+	playerData[player.Name]["times_played"] += 1
+	print(playerData[player.Name]["times_played"])
+end
+
+function playerLeft(player)
+	-- 데이터 저장
+	save(player)
+	
+	-- 캐시된 데이터 삭제
+	playerData[player.Name] = nil
+end
+
+
+-- 데이터 저장소 함수
+
+function get(player)
+	local loaded = nil
+	--
+	local suc, err = pcall(function()
+		loaded = DataStore:GetAsync("Plr_" .. player.UserId)
+	end)
+	if not suc then
+		warn(err)
+	end
+	--
+	if loaded == nil then
+		return copyTable(DEFAULT_PLAYER_DATA)
+	else
+		return loaded
+	end
+end
+
+function save(player)
+	local suc, err = pcall(function()
+		DataStore:SetAsync(
+			-- 키
+			"Plr_" .. player.UserId,
+			
+			-- 캐시된 데이터
+			playerData[player.Name]
+		)
+	end)
+	if not suc then
+		warn(err)
+	end
+end
+
+
+-- 테이블 함수
+
+function copyTable(toCopy)
+	-- 새로운 copy 테이블 생성
+	local copy = {}
+	
+	-- toCopy 테이블 반복
+	for i, v in pairs(toCopy) do
+		-- 값이 중첩된 테이블/딕셔너리인지 확인하기
+		if typeof(v) == "table" then
+			-- 중첩된 테이블/딕셔너리 복사
+			v = copyTable(v)
+		end
+		
+		-- 복사된 테이블에 값 입력
+		copy[i] = v
+	end
+	
+	-- copy 반환
+	return copy
+end
+
+
+--
+
+Players.PlayerAdded:Connect(playerJoined)
+Players.PlayerRemoving:Connect(playerLeft)
