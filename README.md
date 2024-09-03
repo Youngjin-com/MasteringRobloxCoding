@@ -1,6 +1,6 @@
 # 로블록스 코딩 마스터하기
 
-<img src="https://www.youngjin.com/images/book_cover/9788931477221.jpg" height="350px"></a>
+<img src="https://www.youngjin.com/images/book_cover/9788931477221.jpg" height="350px" style="border: 2px solid grey;">
 
 [로블록스 코딩 마스터하기 (영진닷컴)](https://blog.naver.com/ydot/223532722753)
 
